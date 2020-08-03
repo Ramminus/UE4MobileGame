@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "HealthModule.h"
 #include "Teamable.generated.h"
 
 

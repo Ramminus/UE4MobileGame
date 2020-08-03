@@ -3,6 +3,9 @@
 
 #include "AttackModule.h"
 #include "HealthModule.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include <MobileGame\Teamable.h>
+
 
 // Sets default values for this component's properties
 UAttackModule::UAttackModule()
@@ -36,7 +39,26 @@ void UAttackModule::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 void UAttackModule::OnAttack()
 {
 	if ((HealthModule != NULL) &&(HealthModule->IsDead))return;
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Attack!"));
+
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(GetOwner());
+	TArray<AActor*> HitActors;
+	
+	if (UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetOwner()->GetActorLocation(), 500, ObjectTypes, nullptr, ActorsToIgnore, HitActors)) {
+		for (int i = 0; i < HitActors.Num(); i++)
+		{
+			
+			if (HitActors[i]->GetClass()->ImplementsInterface(UTeamable::StaticClass())) {
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, HitActors[i]->GetName());
+			}
+
+		}
+	}
 }
 
 

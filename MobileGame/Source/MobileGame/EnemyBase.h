@@ -37,5 +37,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Team")
 	ETeam GetTeam();
 	virtual ETeam GetTeam_Implementation();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Attack")
+	class UHealthModule* GetHealthModule(); virtual class UHealthModule* GetHealthModule_Implementation() override;
 
 };

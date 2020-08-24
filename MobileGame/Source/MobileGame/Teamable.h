@@ -27,4 +27,6 @@ class MOBILEGAME_API ITeamable
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Team")
 	ETeam GetTeam();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Attack")
+	class UHealthModule* GetHealthModule();
 };

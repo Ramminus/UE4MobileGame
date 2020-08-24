@@ -1,0 +1,8 @@
+MobileGame Notes:
+
+To Blender
+
+HeadScale = 0.2, Z = 1.2 Y = -0.05
+TorsoScale = 0.4, z = 0.16
+footscale = 0.4 , X = 0.2, Y = -0.15
+handScale = 0.3, X = 0.5, Z = 0.6

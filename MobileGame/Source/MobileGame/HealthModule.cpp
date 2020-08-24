@@ -37,7 +37,7 @@ bool UHealthModule::CanDamage(ETeam thisTeam, ETeam OtherTeam)
 
 void UHealthModule::TakeDamage(int amount, ETeam thisTeam, ETeam attackersTeam)
 {
-	if (!CanDamage(thisTeam, attackersTeam))return;
+	if (!CanDamage(thisTeam, attackersTeam) || IsDead)return;
 	CurrentHealth -= amount;
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Current Health is: %d"), CurrentHealth));
 	float percentage = (float)CurrentHealth / (float)MaxHealth;

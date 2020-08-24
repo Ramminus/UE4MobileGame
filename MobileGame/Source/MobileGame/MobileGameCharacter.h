@@ -8,6 +8,7 @@
 #include "MobileGameCharacter.generated.h"
 
 class UHealthModule;
+class UEquipmentModule;
 
 UCLASS(config=Game)
 class AMobileGameCharacter : public ACharacter,  public ITeamable
@@ -41,10 +42,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ETeam Team;
 
+
 protected:
 	bool isTouching;
 	float TouchX, TouchY;
-
+	
 protected:
 
 	/** Resets HMD orientation in VR. */
@@ -86,7 +88,9 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Team")
-	ETeam GetTeam();
-	virtual ETeam GetTeam_Implementation();
+	ETeam GetTeam(); virtual ETeam GetTeam_Implementation() override;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Attack")
+		class UHealthModule* GetHealthModule(); virtual class UHealthModule* GetHealthModule_Implementation() override;
+
 };
 

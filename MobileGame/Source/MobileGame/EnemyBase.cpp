@@ -38,4 +38,6 @@ ETeam AEnemyBase::GetTeam_Implementation()
 {
 	return Team;
 }
-
+UHealthModule* AEnemyBase::GetHealthModule_Implementation() {
+	return HealthModule;
+}

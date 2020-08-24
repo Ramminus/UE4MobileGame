@@ -7,7 +7,7 @@
 #include "AttackModule.generated.h"
 
 class UHealthModule;
-
+class UEquipmentModule;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MOBILEGAME_API UAttackModule : public UActorComponent
 {
@@ -19,6 +19,7 @@ public:
 
 protected:
 	UHealthModule* HealthModule;
+	UEquipmentModule* EquipmentModule;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -28,5 +29,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	UFUNCTION(BlueprintCallable)
 		void OnAttack();
+
+private:
+	
 	
 };

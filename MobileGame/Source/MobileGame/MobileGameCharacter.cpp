@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
 #include "HealthModule.h"
+#include "EquipmentModule.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMobileGameCharacter
@@ -45,7 +46,7 @@ AMobileGameCharacter::AMobileGameCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
+	
 	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -99,6 +100,8 @@ void AMobileGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AMobileGameCharacter::OnResetVR);
+
+
 }
 
 ETeam AMobileGameCharacter::GetTeam_Implementation()
@@ -106,11 +109,17 @@ ETeam AMobileGameCharacter::GetTeam_Implementation()
 	return Team;
 }
 
+UHealthModule* AMobileGameCharacter::GetHealthModule_Implementation()
+{
+	return HealthModule;
+}
+
 
 void AMobileGameCharacter::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
+
 
 void AMobileGameCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {

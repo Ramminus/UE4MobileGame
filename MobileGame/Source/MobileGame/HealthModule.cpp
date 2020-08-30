@@ -1,7 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Net/UnrealNetwork.h"
+#include "Engine/Engine.h"
 #include "HealthModule.h"
+
+void UHealthModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UHealthModule, CurrentHealth);
+}
 
 // Sets default values for this component's properties
 UHealthModule::UHealthModule()
@@ -13,6 +21,25 @@ UHealthModule::UHealthModule()
 	// ...
 }
 
+
+void UHealthModule::OnHealthUpodated()
+{
+	float percentage = (float)CurrentHealth / (float)MaxHealth;
+	OnTakeDamage.Broadcast(percentage);
+
+	if (CurrentHealth <= 0) {
+		OnDeath();
+	}
+
+
+	
+
+	//Functions that occur on all machines. 
+	/*
+		Any special functionality that should occur as a result of damage or death should be placed here.
+	*/
+	
+}
 
 // Called when the game starts
 void UHealthModule::BeginPlay()
@@ -40,11 +67,9 @@ void UHealthModule::TakeDamage(int amount, ETeam thisTeam, ETeam attackersTeam)
 	if (!CanDamage(thisTeam, attackersTeam) || IsDead)return;
 	CurrentHealth -= amount;
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Current Health is: %d"), CurrentHealth));
-	float percentage = (float)CurrentHealth / (float)MaxHealth;
-	OnTakeDamage.Broadcast(percentage);
-	if (CurrentHealth <= 0) {
-		OnDeath();
-	}
+	OnHealthUpodated();
+	
+	
 }
 
 void UHealthModule::HealHealth(int amount)
@@ -53,7 +78,12 @@ void UHealthModule::HealHealth(int amount)
 	if (CurrentHealth > MaxHealth) CurrentHealth = MaxHealth;
 	IsDead = CurrentHealth <= 0;
 	float percentage = (float)CurrentHealth / (float)MaxHealth;
-	OnTakeDamage.Broadcast(percentage);
+	//OnTakeDamage.Broadcast(percentage);
+}
+
+void UHealthModule::OnRep_CurrentHealth()
+{
+	OnHealthUpodated();
 }
 
 

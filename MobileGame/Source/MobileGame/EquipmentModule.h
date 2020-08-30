@@ -9,8 +9,10 @@
 
 #include "EquipmentModule.generated.h"
 
-
+class UAnimMontage;
 class USkeletalMeshComponent;
+class UWeapon;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquipWeapon);
 
 UENUM(BlueprintType)
 enum class EWeaponTypes : uint8 {
@@ -33,10 +35,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AttackDelay;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Damage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackAngle;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float AttackRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USkeletalMesh* Model;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* MontageToPlay;
 	FWeaponData() {
 		AttachedItemID = -1;
 	}
@@ -54,19 +63,26 @@ class MOBILEGAME_API UEquipmentModule : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UEquipmentModule();
-	UPROPERTY(VisibleAnywhere)
-		FWeaponData CurrentWeapon;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	UPROPERTY(VisibleAnywhere,  BlueprintReadWrite)
 		USkeletalMeshComponent* WeaponMesh;
+	UPROPERTY(BlueprintAssignable, Category="Events")
+	FOnEquipWeapon OnEquipWeapon;
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnUpdateWeapon)
+		UWeapon* CurrentWeapon;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
+	UFUNCTION()
+	void OnUpdateWeapon();
+	UFUNCTION(Server, Reliable)
+	void ServerEquipWeapon(TSubclassOf<UWeapon> WeaponToEquip);
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	UFUNCTION(BlueprintCallable)
-		void EquipWeapon(FWeaponData NewWeapon);
-
+		void EquipWeapon (TSubclassOf<UWeapon> NewWeapon);
+	FORCEINLINE UWeapon* GetEquipedWeapon() const{return CurrentWeapon;}
 		
 };

@@ -18,6 +18,9 @@
 
 AMobileGameCharacter::AMobileGameCharacter()
 {
+	
+	PrimaryActorTick.bCanEverTick = true;
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -46,12 +49,16 @@ AMobileGameCharacter::AMobileGameCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	
+
+	//Create WeaponMesh
+	WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
+	WeaponMeshComponent->SetupAttachment(RootComponent);
 	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 void AMobileGameCharacter::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
 	//if (isTouching) {
 	//	float NewX, NewY;
 
@@ -102,6 +109,11 @@ void AMobileGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AMobileGameCharacter::OnResetVR);
 
 
+}
+
+void AMobileGameCharacter::SetWeaponMesh(USkeletalMesh* const WeaponMesh)
+{
+	WeaponMeshComponent->SetSkeletalMesh(WeaponMesh);
 }
 
 ETeam AMobileGameCharacter::GetTeam_Implementation()

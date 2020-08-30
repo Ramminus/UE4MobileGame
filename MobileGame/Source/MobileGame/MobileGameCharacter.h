@@ -9,7 +9,7 @@
 
 class UHealthModule;
 class UEquipmentModule;
-
+class USkeletalMeshComponent;
 UCLASS(config=Game)
 class AMobileGameCharacter : public ACharacter,  public ITeamable
 {
@@ -26,7 +26,7 @@ public:
 	AMobileGameCharacter();
 
 	void Tick(float DeltaTime);
-
+	
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -46,7 +46,9 @@ public:
 protected:
 	bool isTouching;
 	float TouchX, TouchY;
-	
+	/** Weapon Skeletal mesh Component*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+		USkeletalMeshComponent* WeaponMeshComponent;
 protected:
 
 	/** Resets HMD orientation in VR. */
@@ -86,7 +88,8 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
+	UFUNCTION(BlueprintCallable, Category="Mesh")
+	void SetWeaponMesh(USkeletalMesh* const WeaponMesh);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Team")
 	ETeam GetTeam(); virtual ETeam GetTeam_Implementation() override;
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Attack")

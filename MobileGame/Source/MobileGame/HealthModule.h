@@ -21,8 +21,10 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MOBILEGAME_API UHealthModule : public UActorComponent
 {
 	GENERATED_BODY()
+	
 
-public:	
+public:
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	// Sets default values for this component's properties
 	UHealthModule();
 	UPROPERTY(EditAnywhere)
@@ -33,9 +35,10 @@ public:
 	bool IsDead;
 
 protected:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_CurrentHealth)
 	int CurrentHealth;
-	
+	UFUNCTION()
+	void OnHealthUpodated();
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -48,7 +51,9 @@ public:
 	void TakeDamage(int amount, ETeam thisTeam, ETeam attackersTeam);
 	UFUNCTION(BlueprintCallable)
 	void HealHealth(int amount);
-	
+
+	UFUNCTION()
+	void OnRep_CurrentHealth();
 };
 
 

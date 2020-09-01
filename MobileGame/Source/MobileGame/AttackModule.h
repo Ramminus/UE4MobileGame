@@ -27,11 +27,13 @@ protected:
 	UEquipmentModule* EquipmentModule;
 	float AttackTimer;
 	bool bHasAttacked;
+
+	//Attack Timer Handler - used when starting an attack;
+	FTimerHandle AttackTimerHandler;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	void DoWeaponAttack(UWeapon* const Weapon);
-	void DoWeaponAttack_Sword(UWeapon* const Weapon);
+
 
 
 	//Server implementation for Start Attack

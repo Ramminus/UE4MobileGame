@@ -27,12 +27,7 @@ void AEnemyBase::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
 
 ETeam AEnemyBase::GetTeam_Implementation()
 {

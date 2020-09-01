@@ -20,7 +20,7 @@ UAttackModule::UAttackModule()
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true);
 	bHasAttacked = true;
-	
+
 	// ...
 }
 
@@ -34,64 +34,10 @@ void UAttackModule::BeginPlay()
 	HealthModule = Cast<UHealthModule>(GetOwner()->GetComponentByClass(UHealthModule::StaticClass()));
 	EquipmentModule = Cast<UEquipmentModule>(GetOwner()->GetComponentByClass(UEquipmentModule::StaticClass()));
 	// ...
-	
+
 }
 
-void UAttackModule::DoWeaponAttack(UWeapon* const Weapon)
-{
 
-	switch(Weapon->GetWeaponType())
-	{
-		
-		case EWeaponTypes::Sword:
-			DoWeaponAttack_Sword(Weapon);
-			break;
-		default:
-			FString ErrorLog = TEXT("No Attack implementation for type - ");
-			ErrorLog.Append(UEnum::GetValueAsString(Weapon->GetWeaponType()));
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, ErrorLog);
-		
-	}
-}
-
-void UAttackModule::DoWeaponAttack_Sword(UWeapon* const Weapon)
-{
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(GetOwner());
-	TArray<AActor*> HitActors;
-
-	const FVector OwnerPosFixed = FVector(GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y, 0);
-	DrawDebugSphere(GetWorld(), GetOwner()->GetActorLocation(), Weapon->GetAttackRange(), 32, FColor::Red, true, 10);
-	FString RangeMessage = FString::Printf(TEXT("The Range is %f"), Weapon->GetAttackRange());
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, RangeMessage);
-
-	const bool bOverlapped = UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetOwner()->GetActorLocation(), Weapon->GetAttackRange(), ObjectTypes, nullptr, ActorsToIgnore, HitActors);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, bOverlapped ? TEXT("true") : TEXT("false"));
-	if (bOverlapped) {
-		for (int i = 0; i < HitActors.Num(); i++)
-		{
-
-
-			if (HitActors[i]->GetClass()->ImplementsInterface(UTeamable::StaticClass())) {
-
-				//Fix the enemies position;
-				const FVector EnemyPosFixed = FVector(HitActors[i]->GetActorLocation().X, HitActors[i]->GetActorLocation().Y, 0);
-
-				FVector EnemyToCharacter = (EnemyPosFixed - OwnerPosFixed);
-				EnemyToCharacter.Normalize();
-				const float AngleBetween = FMath::Acos(FVector::DotProduct(EnemyToCharacter, GetOwner()->GetActorForwardVector()));
-				if (FMath::RadiansToDegrees(AngleBetween) <= Cast<USword>(Weapon)->GetAttackAngle()) {
-					ITeamable::Execute_GetHealthModule(HitActors[i])->TakeDamage(Weapon->GetDamage(), ITeamable::Execute_GetTeam(HitActors[i]), Weapon->GetOwnerTeam());
-				}
-			}
-
-		}
-	}
-}
 
 
 
@@ -100,78 +46,48 @@ void UAttackModule::DoWeaponAttack_Sword(UWeapon* const Weapon)
 void UAttackModule::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	if (AttackTimer > 0)
+	{
+		AttackTimer -= DeltaTime;
+	}
 	// ...
 }
 
 void UAttackModule::OnAttack()
 {
 
-	FString role = StaticEnum<EWeaponTypes>()->GetValueAsString(GetOwnerRole());
-
-	if (GetOwnerRole() == ROLE_AutonomousProxy)
-	{
-		ServerOnAttack();
-		
-	}
-	else if(GetOwnerRole() == ROLE_Authority)
-	{
-		if ((HealthModule == nullptr) || (HealthModule->IsDead) || EquipmentModule->GetEquipedWeapon() == nullptr)return;
-		
-		DoWeaponAttack(EquipmentModule->GetEquipedWeapon());
-		
-	}
-	//if ((HealthModule == nullptr) || (HealthModule->IsDead) || EquipmentModule->CurrentWeapon.AttachedItemID == -1)return;
-
-	//ITeamable* OwnerTeamable = Cast<ITeamable>(GetOwner());
-	//TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	//ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
-	//ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
-	//ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-	//TArray<AActor*> ActorsToIgnore;
-	//ActorsToIgnore.Add(GetOwner());
-	//TArray<AActor*> HitActors;
-	//const FVector OwnerPosFixed = FVector(GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y, 0);
-	//if (UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetOwner()->GetActorLocation(), EquipmentModule->CurrentWeapon.AttackRange, ObjectTypes, nullptr, ActorsToIgnore, HitActors)) {
-	//	for (int i = 0; i < HitActors.Num(); i++)
-	//	{
-	//		
-	//	
-	//		if (HitActors[i]->GetClass()->ImplementsInterface(UTeamable::StaticClass())) {
-
-	//			//Fix the enemies position;
-	//			const FVector EnemyPosFixed = FVector(HitActors[i]->GetActorLocation().X, HitActors[i]->GetActorLocation().Y, 0);
-	//			
-	//			FVector EnemyToCharacter = (EnemyPosFixed - OwnerPosFixed);
-	//			EnemyToCharacter.Normalize();
-	//			const float AngleBetween = FMath::Acos(FVector::DotProduct(EnemyToCharacter, GetOwner()->GetActorForwardVector()));
-	//			if (FMath::RadiansToDegrees(AngleBetween) <= EquipmentModule->CurrentWeapon.AttackAngle) {
-	//				ITeamable::Execute_GetHealthModule(HitActors[i])->TakeDamage(EquipmentModule->CurrentWeapon.Damage, ITeamable::Execute_GetTeam(HitActors[i]), ITeamable::Execute_GetTeam(GetOwner()));
-	//			}
-	//		}
-
-	//	}
-	//}
-	//
-	//else if(GetOwnerRole() == ROLE_Authority){
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("Server is Attacking"));
-	//}
+	//Only server can execute this.
+	if(GetOwnerRole() != ROLE_Authority)return;
+	EquipmentModule->GetEquipedWeapon()->OnAttack(GetWorld(), GetOwner());
 }
 
 void UAttackModule::StartAttack()
 {
 	//Client logic
-	if(GetOwnerRole() == ROLE_AutonomousProxy)
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
 	{
 		//Request to start attack to the server.
 		ServerOnStartAttack();
-		
+
 	}
 	// Server logic
-	else if(GetOwnerRole() == ROLE_Authority)
+	else if (GetOwnerRole() == ROLE_Authority)
 	{
-		
 
+		//Null Checks
+		if ((HealthModule == nullptr) || (HealthModule->IsDead) || EquipmentModule->GetEquipedWeapon() == nullptr)return;
+		
+		//Return if the Attack Timer is greater than 0
+		if (AttackTimer > 0) return;
+
+		//Set Attack Timer to Weapon Attack Speed.
+		AttackTimer = EquipmentModule->GetEquipedWeapon()->GetAttackSpeed();
+
+		//Get the Attack Delay.
+		float AttackDelay = EquipmentModule->GetEquipedWeapon()->GetAttackDelay();
+
+		//Set up the delay timer to call the OnAttack Function
+		GetWorld()->GetTimerManager().SetTimer(AttackTimerHandler, this, &UAttackModule::OnAttack, AttackDelay);
 		//Function to call on all clients.
 		MultiCastOnStartAttack();
 	}

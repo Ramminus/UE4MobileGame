@@ -26,19 +26,22 @@ public:
 	ETeam OwnerTeam;
 protected:
 	/* The Weapon type for this weapon.*/
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Attack Values")
 	EWeaponTypes WeaponType;
 
 	//The model for the weapon.
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Visuals")
 	USkeletalMesh* Model;
 
 	//Base Damage of the weapon.
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Attack Values")
 	float Damage;
 
+	//Weapon Base Attack Speed.
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Attack Values")
+	float AttackSpeed;
 	//Attack range for the weapon.
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Attack Values")
 	float AttackRange;
 
 	//Delay for the attack function to be called
@@ -46,12 +49,11 @@ protected:
 	float AttackDelay;
 
 	//Montage to play at the begining of the attack.
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Visuals")
 	UAnimMontage* MontageToPlay;
 
 	
 public:
-
 	//Getters
 	FORCEINLINE EWeaponTypes GetWeaponType() const { return WeaponType;}
 	FORCEINLINE ETeam GetOwnerTeam() const { return OwnerTeam;}
@@ -59,5 +61,8 @@ public:
 	FORCEINLINE float GetAttackRange() const {return AttackRange;}
 	FORCEINLINE float GetDamage() const { return Damage;}
 	FORCEINLINE UAnimMontage* GetMontage() const {return MontageToPlay;}
-	
+	FORCEINLINE float GetAttackSpeed()  const {return AttackSpeed;}
+	FORCEINLINE float GetAttackDelay() const {return AttackDelay;}
+
+	virtual void OnAttack(UWorld* WorldContext,  AActor* AttackerActor);
 };

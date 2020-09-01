@@ -9,4 +9,10 @@ UWeapon::UWeapon()
 	
 }
 
+void UWeapon::OnAttack(UWorld* WorldContext,  AActor* AttackerActor)
+{
+
+	
+}
+
 

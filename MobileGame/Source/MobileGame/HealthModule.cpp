@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "HealthModule.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
-#include "HealthModule.h"
+
 
 void UHealthModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

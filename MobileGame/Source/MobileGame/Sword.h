@@ -19,6 +19,10 @@ protected:
 	float AttackAngle;
 public:
 
-
+	//Getters
 	FORCEINLINE float GetAttackAngle() const { return AttackAngle;}
+
+
+	//Attack Function Override
+	virtual void OnAttack(UWorld* WorldContext,  AActor* AttackerActor) override;
 };
